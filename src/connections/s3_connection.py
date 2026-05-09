@@ -40,5 +40,3 @@ class s3_operations:
 
 
 
-
-
