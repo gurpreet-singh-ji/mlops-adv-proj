@@ -1,0 +1,7 @@
+[core]
+    no_scm = True
+    remote = myremote
+['remote "mylocal"']
+    url = ../local_s3
+['remote "myremote"']
+    url = s3://complaints-datagrid-mlops-adv-proj
