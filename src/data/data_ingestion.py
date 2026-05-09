@@ -83,9 +83,9 @@ def main():
         test_size = params['data_ingestion']['test_size']
         # test_size = 0.2
         
-        # df = load_data(data_url='https://raw.githubusercontent.com/vikashishere/Datasets/refs/heads/main/data.csv')
-        s3 = s3_connection.s3_operations( aws_bucket_name, aws_access_key, aws_secret_key)
-        df = s3.fetch_file_from_s3("data.csv")
+        df = load_data(data_url='https://raw.githubusercontent.com/vikashishere/Datasets/refs/heads/main/data.csv')
+        # s3 = s3_connection.s3_operations( aws_bucket_name, aws_access_key, aws_secret_key)
+        # df = s3.fetch_file_from_s3("data.csv")
 
 
 
