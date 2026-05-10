@@ -70,26 +70,26 @@ def normalize_text(text):
 
 # Below code block is for local use
 # -------------------------------------------------------------------------------------
-mlflow.set_tracking_uri('https://dagshub.com/gurpreet-singh-ji/mlops-adv-proj.mlflow')
-dagshub.init(repo_owner='gurpreet-singh-ji', repo_name='mlops-adv-proj', mlflow=True)
+# mlflow.set_tracking_uri('https://dagshub.com/gurpreet-singh-ji/mlops-adv-proj.mlflow')
+# dagshub.init(repo_owner='gurpreet-singh-ji', repo_name='mlops-adv-proj', mlflow=True)
 # -------------------------------------------------------------------------------------
 
 # Below code block is for production use
 # -------------------------------------------------------------------------------------
 # Set up DagsHub credentials for MLflow tracking
-# dagshub_token = os.getenv("CAPSTONE_TEST")
-# if not dagshub_token:
-#     raise EnvironmentError("CAPSTONE_TEST environment variable is not set")
+dagshub_token = os.getenv("CAPSTONE_TEST") or "981c0712d70812ec9e3224acbb4097cfd11e1daf"
+if not dagshub_token:
+    raise EnvironmentError("CAPSTONE_TEST environment variable is not set")
 
-# os.environ["MLFLOW_TRACKING_USERNAME"] = dagshub_token
-# os.environ["MLFLOW_TRACKING_PASSWORD"] = dagshub_token
+os.environ["MLFLOW_TRACKING_USERNAME"] = dagshub_token
+os.environ["MLFLOW_TRACKING_PASSWORD"] = dagshub_token
 
-# dagshub_url = "https://dagshub.com"
-# repo_owner = "vikashdas770"
-# repo_name = "YT-Capstone-Project"
-# # Set up MLflow tracking URI
-# mlflow.set_tracking_uri(f'{dagshub_url}/{repo_owner}/{repo_name}.mlflow')
-# -------------------------------------------------------------------------------------
+dagshub_url = "https://dagshub.com"
+repo_owner = "gurpreet-singh-ji"
+repo_name = "mlops-adv-proj"
+# Set up MLflow tracking URI
+mlflow.set_tracking_uri(f'{dagshub_url}/{repo_owner}/{repo_name}.mlflow')
+# --------------------------------------------------------------------------------
 
 
 # Initialize Flask app
@@ -116,10 +116,14 @@ PREDICTION_COUNT = Counter(
 model_name = "my_model"
 def get_latest_model_version(model_name):
     client = mlflow.MlflowClient()
-    latest_version = client.get_latest_versions(model_name, stages=["Staging"])
-    if not latest_version:
-        latest_version = client.get_latest_versions(model_name, stages=["None"])
-    return latest_version[0].version if latest_version else None
+    latest_v = client.search_model_versions(f"name='{model_name}'")
+    staging_versions = [v for v in latest_v if v.current_stage == "Staging"]
+    if not staging_versions:
+        raise Exception(f"No Staging model found for {model_name}")
+
+    latest_version = max(staging_versions, key=lambda v: int(v.version))
+
+    return latest_version.version
 
 model_version = get_latest_model_version(model_name)
 model_uri = f'models:/{model_name}/{model_version}'
