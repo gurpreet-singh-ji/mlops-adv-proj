@@ -1,0 +1,5 @@
+server:
+  extraScrapeConfigs:
+    - job_name: 'mlops-app'
+      static_configs:
+        - targets: ['mlops-app-service.mlops-namespace.svc.cluster.local:5000']
